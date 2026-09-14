@@ -1,5 +1,3 @@
-// File: backend/config/config.js
-
 require("dotenv").config();
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -12,7 +10,9 @@ const config = {
 
   mongoUri: process.env.DB_URI,
 
-  clientUrl: process.env.CLIENT_URL || "http://localhost:3001",
+  clientUrl: (
+    process.env.CLIENT_URL || "http://localhost:3001"
+  ).replace(/\/+$/, ""),
 
   companyEmailDomain:
     process.env.COMPANY_EMAIL_DOMAIN || "company.co.za",

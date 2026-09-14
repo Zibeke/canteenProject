@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { StyledForm } from "./StyledForm";
 import { adminLogin } from "../../slices/authSlice";
+import { url } from "../../slices/api";
 import { useState } from "react";
 
 const Login = () => {
@@ -61,7 +62,7 @@ const Login = () => {
       ) : (
         <>
           <p>Sign in with your Gmail account to continue.</p>
-          <a href="http://localhost:5000/api/auth/google?redirect=%2F">
+          <a href={`${url}/auth/google?redirect=%2F`}>
             Continue with Google
           </a>
           <p>
@@ -76,3 +77,4 @@ const Login = () => {
 };
 
 export default Login;
+

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { StyledForm } from "./StyledForm";
+import { url } from "../../slices/api";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const Register = () => {
     <StyledForm>
       <h2>Register</h2>
       <p>Registration is completed securely with your Gmail account.</p>
-      <a href="http://localhost:5000/api/auth/google?redirect=%2F">
+      <a href={`${url}/auth/google?redirect=%2F`}>
         Continue with Google
       </a>
     </StyledForm>

@@ -14,6 +14,10 @@ const config = {
     process.env.CLIENT_URL || "http://localhost:3001"
   ).replace(/\/+$/, ""),
 
+  useSecureCookies:
+    isProduction ||
+    String(process.env.CLIENT_URL || "").toLowerCase().startsWith("https://"),
+
   companyEmailDomain:
     process.env.COMPANY_EMAIL_DOMAIN || "company.co.za",
 

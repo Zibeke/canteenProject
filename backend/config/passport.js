@@ -1,5 +1,3 @@
-// File: backend/config/passport.js
-
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const config = require("./config");
@@ -14,7 +12,13 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const email = profile.emails[0].value.toLowerCase();
+        const email = profile.emails?.[0]?.value?.toLowerCase();
+
+        if (!email) {
+          return done(null, false, {
+            message: "Google account email is required.",
+          });
+        }
 
         if (!email.endsWith("@gmail.com")) {
           return done(null, false, {
@@ -40,7 +44,8 @@ passport.use(
           email: email,
           name: profile.displayName || "User",
           picture: profile.photos[0]?.value || "",
-          role: email === config.adminEmail ? "admin" : "user",
+          role:
+            email === config.adminEmail?.toLowerCase() ? "admin" : "user",
           voucherBalance: 0,
           monthlyVoucherCap: 500,
           lastLoginAt: new Date(),

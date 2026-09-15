@@ -1,5 +1,3 @@
-// File: backend/controllers/authController.js
-
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
 const User = require("../models/User");
@@ -21,7 +19,7 @@ const setTokenCookies = (res, accessToken, refreshToken) => {
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     secure: config.isProduction,
-    sameSite: "lax",
+    sameSite: config.isProduction ? "none" : "lax",
     maxAge: 15 * 60 * 1000,
     signed: false,
   });
@@ -29,7 +27,7 @@ const setTokenCookies = (res, accessToken, refreshToken) => {
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: config.isProduction,
-    sameSite: "lax",
+    sameSite: config.isProduction ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
     signed: false,
   });

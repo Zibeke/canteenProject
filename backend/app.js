@@ -13,6 +13,8 @@ require("./config/passport");
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 // Security middleware
 app.use(helmet({
   hsts: { maxAge: 31536000, includeSubDomains: true },
@@ -49,7 +51,7 @@ app.use(session({
   cookie: {
     secure: config.isProduction,
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: config.isProduction ? "none" : "lax",
   },
 }));
 

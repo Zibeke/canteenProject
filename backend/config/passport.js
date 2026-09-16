@@ -20,9 +20,10 @@ passport.use(
           });
         }
 
-        if (!email.endsWith("@gmail.com")) {
+        const allowedDomain = `@${config.companyEmailDomain.toLowerCase()}`;
+        if (!config.allowAllEmails && !email.endsWith(allowedDomain)) {
           return done(null, false, {
-            message: "Only Gmail accounts are allowed during testing.",
+            message: "Only approved employee email accounts are allowed.",
           });
         }
 

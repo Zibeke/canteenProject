@@ -18,8 +18,17 @@ async function seedAdmin() {
     const existingAdmin = await User.findOne({ email: adminEmail });
 
     if (existingAdmin) {
-      console.log(`Admin user ${adminEmail} already exists`);
-      process.exit(0);
+      if (existingAdmin.role === "admin") {
+        console.log(`Admin user ${adminEmail} already exists`);
+        await mongoose.connection.close();
+        process.exit(0);
+      }
+
+      console.error(
+        `Cannot seed admin: ${adminEmail} already belongs to a non-admin user`
+      );
+      await mongoose.connection.close();
+      process.exit(1);
     }
 
     const admin = new User({

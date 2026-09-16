@@ -9,6 +9,7 @@ const session = require("express-session");
 const path = require("path");
 const config = require("./config/config");
 const webhookRoutes = require("./routes/webhooks");
+const sameOrigin = require("./middleware/sameOrigin");
 require("./config/passport");
 
 const app = express();
@@ -58,6 +59,7 @@ app.use(session({
 // Passport configuration
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(sameOrigin);
 
 // Static files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -145,9 +147,10 @@ app.use((error, req, res, next) => {
   console.error("Error:", error);
 
   const status = error.status || 500;
-  const message = config.isProduction
-    ? "Internal Server Error"
-    : error.message;
+  const message =
+    config.isProduction && status >= 500
+      ? "Internal Server Error"
+      : error.message || "Request failed";
 
   res.status(status).json({ error: message });
 });

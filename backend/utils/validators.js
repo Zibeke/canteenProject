@@ -5,12 +5,16 @@ const validateProduct = (data) => {
     name: Joi.string().max(150).required(),
     description: Joi.string().max(2000).required(),
     price: Joi.number().min(0).precision(2).required(),
-    stock: Joi.number().min(0).required(),
+    stock: Joi.number().integer().min(0).max(100000).required(),
     category: Joi.string()
       .valid("Hot Food", "Cold Drinks", "Snacks", "Breakfast")
       .required(),
-    isSpecial: Joi.boolean(),
-    specialPrice: Joi.number().min(0).precision(2).allow(null),
+    isSpecial: Joi.boolean().default(false),
+    specialPrice: Joi.when("isSpecial", {
+      is: true,
+      then: Joi.number().min(0).precision(2).required(),
+      otherwise: Joi.number().min(0).precision(2).allow(null),
+    }),
     isAvailableToday: Joi.boolean(),
   }).unknown(false);
 

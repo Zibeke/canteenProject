@@ -74,6 +74,10 @@ const getProductBySlug = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: "At least one product image is required" });
+    }
+
     const { error, value } = validateProduct(req.body);
 
     if (error) {

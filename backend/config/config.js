@@ -2,6 +2,44 @@ require("dotenv").config();
 
 const isProduction = process.env.NODE_ENV === "production";
 
+const requiredProductionVariables = [
+  "DB_URI",
+  "CLIENT_URL",
+  "GOOGLE_CLIENT_ID",
+  "GOOGLE_CLIENT_SECRET",
+  "GOOGLE_CALLBACK_URL",
+  "JWT_SECRET",
+  "JWT_REFRESH_SECRET",
+  "SESSION_SECRET",
+  "ADMIN_EMAIL",
+  "ADMIN_USERNAME",
+  "ADMIN_PASSWORD",
+  "STRIPE_SECRET_KEY",
+  "STRIPE_WEBHOOK_SECRET",
+  "SMTP_USER",
+  "SMTP_PASSWORD",
+];
+
+if (isProduction) {
+  const missingVariables = requiredProductionVariables.filter(
+    (name) => !process.env[name]
+  );
+
+  if (missingVariables.length > 0) {
+    throw new Error(
+      `Missing required production environment variables: ${missingVariables.join(", ")}`
+    );
+  }
+
+  if (!process.env.CLIENT_URL.startsWith("https://")) {
+    throw new Error("CLIENT_URL must use HTTPS in production");
+  }
+
+  if (!process.env.GOOGLE_CALLBACK_URL.startsWith("https://")) {
+    throw new Error("GOOGLE_CALLBACK_URL must use HTTPS in production");
+  }
+}
+
 const config = {
   nodeEnv: process.env.NODE_ENV || "development",
   isProduction,
@@ -21,6 +59,9 @@ const config = {
   companyEmailDomain:
     process.env.COMPANY_EMAIL_DOMAIN || "company.co.za",
 
+  allowAllEmails:
+    String(process.env.ALLOW_ALL_EMAILS || "false").toLowerCase() === "true",
+
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -39,8 +80,8 @@ const config = {
   sessionSecret: process.env.SESSION_SECRET,
 
   adminEmail: process.env.ADMIN_EMAIL,
-  adminUsername: process.env.ADMIN_USERNAME || "admin",
-  adminPassword: process.env.ADMIN_PASSWORD || "Admin@208",
+  adminUsername: process.env.ADMIN_USERNAME,
+  adminPassword: process.env.ADMIN_PASSWORD,
 
   voucher: {
     monthlyAmount: Number(

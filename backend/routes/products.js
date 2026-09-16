@@ -25,11 +25,34 @@ const upload = multer({
   },
 });
 
+const handleUpload = (req, res, next) => {
+  upload.array("images", 5)(req, res, (error) => {
+    if (!error) {
+      return next();
+    }
+
+    if (error instanceof multer.MulterError) {
+      error.status = 400;
+      error.message =
+        error.code === "LIMIT_FILE_SIZE"
+          ? "Each image must be 2 MB or smaller"
+          : error.code === "LIMIT_FILE_COUNT" ||
+              error.code === "LIMIT_UNEXPECTED_FILE"
+            ? "You can upload up to 5 images"
+            : "Invalid image upload";
+    } else {
+      error.status = 400;
+    }
+
+    next(error);
+  });
+};
+
 router.get("/", getAllProducts);
 router.get("/specials", getSpecials);
 router.get("/:slug", getProductBySlug);
-router.post("/", auth, isAdmin, upload.array("images", 5), createProduct);
-router.put("/:id", auth, isAdmin, upload.array("images", 5), updateProduct);
+router.post("/", auth, isAdmin, handleUpload, createProduct);
+router.put("/:id", auth, isAdmin, handleUpload, updateProduct);
 router.delete("/:id", auth, isAdmin, deleteProduct);
 
 module.exports = router;

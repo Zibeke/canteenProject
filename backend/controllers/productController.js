@@ -6,8 +6,38 @@ const generateSlug = require("../utils/generateSlug");
 const path = require("path");
 const fs = require("fs/promises");
 const sharp = require("sharp");
+const { uploadImage, deleteImage } = require("../utils/cloudinary");
 
-const uploadsDir = path.resolve(__dirname, "../uploads");
+const uploadProductImages = async (files) => {
+  const images = [];
+
+  for (const file of files) {
+    const imageBuffer = await sharp(file.buffer)
+      .resize(400, 400, { fit: "cover" })
+      .webp({ quality: 80 })
+      .toBuffer();
+
+    const publicId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    images.push(await uploadImage(imageBuffer, publicId));
+  }
+
+  return images;
+};
+
+const deleteStoredImage = async (image) => {
+  if (image?.startsWith("/uploads/")) {
+    try {
+      await fs.unlink(path.join(__dirname, "..", image));
+    } catch (error) {
+      if (error.code !== "ENOENT") {
+        throw error;
+      }
+    }
+    return;
+  }
+
+  await deleteImage(image);
+};
 
 const getAllProducts = async (req, res) => {
   try {
@@ -91,25 +121,7 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ error: "Product name already exists" });
     }
 
-    const images = [];
-
-    if (req.files && req.files.length > 0) {
-      await fs.mkdir(uploadsDir, { recursive: true });
-      await fs.access(uploadsDir);
-      for (const file of req.files) {
-        const outputPath = path.join(
-          uploadsDir,
-          `${Date.now()}-${Math.random().toString(36).slice(2)}.webp`
-        );
-
-        await sharp(file.buffer)
-          .resize(400, 400, { fit: "cover" })
-          .webp({ quality: 80 })
-          .toFile(outputPath);
-
-        images.push(`/uploads/${path.basename(outputPath)}`);
-      }
-    }
+    const images = await uploadProductImages(req.files);
 
     const product = new Product({
       name: value.name,
@@ -151,34 +163,11 @@ const updateProduct = async (req, res) => {
     }
 
     let images = product.images;
+    let previousImages = [];
 
     if (req.files && req.files.length > 0) {
-      const uploadsDir = path.join(__dirname, "../uploads");
-      await fs.mkdir(uploadsDir, { recursive: true });
-      for (const image of product.images) {
-        const imagePath = path.join(__dirname, "..", image);
-        try {
-          await fs.unlink(imagePath);
-        } catch (err) {
-          console.log("Image file not found, skipping deletion");
-        }
-      }
-
-      images = [];
-
-      for (const file of req.files) {
-        const outputPath = path.join(
-          uploadsDir,
-          `${Date.now()}-${Math.random()}.webp`
-        );
-
-        await sharp(file.buffer)
-          .resize(400, 400, { fit: "cover" })
-          .webp({ quality: 80 })
-          .toFile(outputPath);
-
-        images.push(`/uploads/${path.basename(outputPath)}`);
-      }
+      previousImages = [...product.images];
+      images = await uploadProductImages(req.files);
     }
 
     const slug = value.name !== product.name ? generateSlug(value.name) : product.slug;
@@ -202,6 +191,11 @@ const updateProduct = async (req, res) => {
     });
 
     await product.save();
+
+    for (const image of previousImages) {
+      await deleteStoredImage(image);
+    }
+
     res.json(product);
   } catch (error) {
     console.error("Update product error:", error);
@@ -219,12 +213,7 @@ const deleteProduct = async (req, res) => {
     }
 
     for (const image of product.images) {
-      const imagePath = path.join(__dirname, "..", image);
-      try {
-        await fs.unlink(imagePath);
-      } catch (err) {
-        console.log("Image file not found, skipping deletion");
-      }
+      await deleteStoredImage(image);
     }
 
     res.json({ message: "Product deleted successfully" });

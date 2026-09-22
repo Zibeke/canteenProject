@@ -33,16 +33,16 @@ const issueTokens = async (user, res) => {
 const setTokenCookies = (res, accessToken, refreshToken) => {
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: config.isProduction,
-    sameSite: config.isProduction ? "none" : "lax",
+    secure: config.useSecureCookies,
+    sameSite: config.useSecureCookies ? "none" : "lax",
     maxAge: 15 * 60 * 1000,
     signed: false,
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: config.isProduction,
-    sameSite: config.isProduction ? "none" : "lax",
+    secure: config.useSecureCookies,
+    sameSite: config.useSecureCookies ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
     signed: false,
   });

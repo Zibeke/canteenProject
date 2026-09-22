@@ -1932,10 +1932,15 @@ a {
   .cart-heading {
     align-items: flex-start;
     gap: 12px;
+    flex-wrap: wrap;
   }
 
   .cart-heading h1 {
     font-size: 26px;
+  }
+
+  .cart-heading p {
+    margin-left: auto;
   }
 
   .cart-table-head {
@@ -1991,6 +1996,7 @@ a {
 
   .cart-checkout {
     width: 100%;
+    padding: 20px;
   }
 
   .admin-page-heading {
@@ -2071,8 +2077,8 @@ a {
 }
 
 .cart-checkout .cart-login {
-  background-color: yellow;
-  color: black;
+  background-color: #ea580c;
+  color: #fff;
 }
 
 .continue-shopping,

@@ -125,17 +125,23 @@ const SideNav = styled.div`
     border-right: 0;
     border-bottom: 1px solid #f1f5f9;
     padding: 1rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.35rem;
 
     .admin-brand {
+      flex-basis: 100%;
       margin-bottom: 1rem;
     }
 
     h3 {
+      flex-basis: 100%;
       margin-bottom: 0.5rem;
     }
 
     a {
-      margin-bottom: 0.35rem;
+      margin: 0;
+      padding: 8px 10px;
     }
   }
 `;

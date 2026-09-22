@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const configuredApiUrl = process.env.REACT_APP_API_URL;
 
 export const url = (
